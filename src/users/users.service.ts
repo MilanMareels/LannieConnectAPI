@@ -16,7 +16,7 @@ export class UsersService {
   async login(loginDTO: LoginDTO) {
     const user: User = (await queryGetUserByEmail(loginDTO.email)) as User;
     await doesUserExist(user.userId);
-    this.comparePassword(loginDTO.password, user.password);
+    await this.comparePassword(loginDTO.password, user.password);
     return {
       user: user,
       succes: true,
