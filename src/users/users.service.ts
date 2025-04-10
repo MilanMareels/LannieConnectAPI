@@ -1,5 +1,4 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { compareSync, hashSync } from 'bcrypt-ts';
 import { LoginDTO } from 'src/types/DTO/LoginDTO';
 import { User } from 'src/types/User';
 import { v7 as uuidv7 } from 'uuid';
