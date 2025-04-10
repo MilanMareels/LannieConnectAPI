@@ -16,7 +16,7 @@ export class UsersService {
   async login(loginDTO: LoginDTO) {
     const user: User = (await queryGetUserByEmail(loginDTO.email)) as User;
     await doesUserExist(user.userId);
-    this.checkPassword(loginDTO.password, user.password);
+    this.comparePassword(loginDTO.password, user.password);
     return {
       user: user,
       succes: true,
@@ -25,7 +25,7 @@ export class UsersService {
 
   async register(registerDTO: RegisterDTO) {
     await doesUserAlreadyExist(registerDTO.email);
-    const hashPassword: string = this.hashPassword(registerDTO.password);
+    const hashPassword: string = await this.hashPassword(registerDTO.password);
     const newUser: User = {
       userId: uuidv7(),
       firstname: registerDTO.firstname,
@@ -40,12 +40,14 @@ export class UsersService {
   }
 
   // Helpers
-  checkPassword = (password: string, hash: string) => {
+  comparePassword = async (password: string, hash: string) => {
+    const { compareSync } = await import('bcrypt-ts');
     const match: boolean = compareSync(password, hash);
     if (!match) throw new UnauthorizedException('Fout wachtwoord!');
   };
 
-  hashPassword = (password: string) => {
-    return hashSync(password, this.salt);
+  hashPassword = async (password: string) => {
+    const { hashSync } = await import('bcrypt-ts');
+    return hashSync(password, 12);
   };
 }
