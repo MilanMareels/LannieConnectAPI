@@ -8,6 +8,7 @@ import { MongoClient } from 'mongodb';
 import { Customer } from 'src/types/Customer';
 import { CreateCustomerDTO } from 'src/types/DTO/CreateCustomerDTO';
 import { UpdateCustomerDTO } from 'src/types/DTO/UpdateCustomerDTO';
+import { Query } from 'src/types/Query';
 import { RetrunObjectCustomers } from 'src/types/ReturnObjectCursomers';
 import { User } from 'src/types/User';
 import { v7 as uuidv7 } from 'uuid';
@@ -19,10 +20,10 @@ const client = new MongoClient(uri);
 
 @Injectable()
 export class CustomersService {
-  async getAllCustomersForUser(userId: string, page: number) {
+  async getAllCustomersForUser(userId: string, page: number, q: string) {
     await this.doesUserExist(userId);
     const customers: RetrunObjectCustomers =
-      await this.queryAllCustomersForUser(userId, page);
+      await this.queryAllCustomersForUser(userId, page, q);
     if (customers.customers.length === 0)
       throw new NotFoundException('Je hebt nog geen customers!');
     return customers;
@@ -66,7 +67,7 @@ export class CustomersService {
       email: createCustomerDTO.email,
       phone: createCustomerDTO.phone,
       address: createCustomerDTO.address,
-      status: 'nog bellen',
+      status: createCustomerDTO.status,
       image: createCustomerDTO.image,
       website: createCustomerDTO.website,
       notes: createCustomerDTO.notes,
@@ -116,12 +117,19 @@ export class CustomersService {
     }
   };
 
-  queryAllCustomersForUser = async (userId: string, page: number) => {
+  queryAllCustomersForUser = async (
+    userId: string,
+    page: number,
+    q: string,
+  ) => {
     try {
+      let query: Query = { userId: userId };
+      if (q != null || q != undefined) query = { userId: userId, status: q };
+
       const customers = (await client
         .db(database)
         .collection('Customers')
-        .find({ userId: userId })
+        .find(query)
         .skip((page - 1) * itemsPerPage)
         .limit(itemsPerPage + 1)
         .project({

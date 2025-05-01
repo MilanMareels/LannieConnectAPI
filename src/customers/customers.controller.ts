@@ -20,8 +20,9 @@ export class CustomersController {
   getAllCustomersForUser(
     @Param('userId') userId: string,
     @Query('page') page: number | 1,
+    @Query('q') q: string,
   ) {
-    return this.customerService.getAllCustomersForUser(userId, page);
+    return this.customerService.getAllCustomersForUser(userId, page, q);
   }
 
   @Get('/:customerId/:userId')

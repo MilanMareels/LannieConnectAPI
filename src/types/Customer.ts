@@ -7,7 +7,7 @@ export interface Customer {
   phone: string;
   address: string;
   website?: string;
-  status: 'lead' | 'nog bellen' | 'gebeld' | 'klant';
+  status: 'lead' | 'nog bellen' | 'klant' | 'geen intresse';
   notes?: string;
   image: string;
 }
